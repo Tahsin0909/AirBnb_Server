@@ -56,6 +56,10 @@ async function run() {
                     bedrooms: req.query.bedrooms,
                     amenities: req.query.amenities,
                     property_type: req.query.property_type,
+                    instant_book: req.query.instant_book,
+                    self_check_in: req.query.self_check_in,
+                    free_cancellation: req.query.free_cancellation,
+                    allow_pets: req.query.allow_pets
                 };
 
 
@@ -119,6 +123,16 @@ async function run() {
                     // Match by property_type if provided
                     {
                         $match: searchQuery?.property_type ? { property_type: searchQuery?.property_type } : {}
+                    },
+                    
+                    // Match by booking_options (instant_book, self_check_in, etc.) if provided
+                    {
+                        $match: {
+                            ...(searchQuery?.instant_book !== undefined ? { "booking_options.instant_book": searchQuery?.instant_book === 'true' } : {}),
+                            ...(searchQuery?.self_check_in !== undefined ? { "booking_options.self_check_in": searchQuery?.self_check_in === 'true' } : {}),
+                            ...(searchQuery?.free_cancellation !== undefined ? { "booking_options.free_cancellation": searchQuery?.free_cancellation === 'true' } : {}),
+                            ...(searchQuery?.allow_pets !== undefined ? { "booking_options.allow_pets": searchQuery?.allow_pets === 'true' } : {})
+                        }
                     }
                 ];
 
