@@ -28,6 +28,8 @@ const client = new MongoClient(uri, {
 
 
 async function run() {
+
+
     try {
         // Connect the client to the server	(optional starting in v4.7)
         // await client.connect();
@@ -41,6 +43,8 @@ async function run() {
 
         app.get('/rooms', async (req, res) => {
             try {
+
+                // search object for search params 
                 const searchQuery = {
                     country: req.query.country,
                     start_date: req.query.start_date,
@@ -53,26 +57,32 @@ async function run() {
                     amenities: req.query.amenities,
                     property_type: req.query.property_type,
                 };
-                console.log(searchQuery);
+
+
                 // Calculate available dates based on the start and end dates
                 const start = new Date(searchQuery?.start_date);
                 const end = new Date(searchQuery?.end_date);
 
-                // Create an array of dates between the start and end date (inclusive)
+
+
+                // Create an array of dates between the start and end date 
                 const availableDates = [];
                 for (let date = start; date <= end; date.setDate(date.getDate() + 1)) {
                     availableDates.push(date.toISOString().split('T')[0]); // Format as YYYY-MM-DD
                 }
-                console.log(availableDates);
+
+
                 const pipeline = [
                     // Match by room_type_categories if provided
                     {
                         $match: searchQuery?.room_type_categories ? { room_type_categories: searchQuery?.room_type_categories } : {}
                     },
+
                     // Match by country if provided
                     {
                         $match: searchQuery?.country ? { country: searchQuery?.country } : {}
                     },
+
                     // Match by price range if provided
                     {
                         $match: {
@@ -80,11 +90,13 @@ async function run() {
                             ...(searchQuery?.max_price ? { price: { $lte: searchQuery?.max_price } } : {})
                         }
                     },
+
                     // Match by max guest if provided
                     {
                         $match: (searchQuery?.max_guests ? { max_guests: { $lte: parseInt(searchQuery?.max_guests) } } : {}),
 
                     },
+
                     // Match by available_dates within the range if provided
                     {
                         $match: searchQuery?.start_date && searchQuery?.end_date ? {
@@ -93,14 +105,17 @@ async function run() {
                             }
                         } : {}
                     },
+
                     // Match by bedrooms if provided
                     {
                         $match: searchQuery?.bedrooms ? { bedrooms: searchQuery?.bedrooms } : {}
                     },
+
                     // Match by amenities if provided
                     {
                         $match: searchQuery?.amenities && searchQuery?.amenities.length > 0 ? { amenities: { $all: searchQuery?.amenities } } : {}
                     },
+
                     // Match by property_type if provided
                     {
                         $match: searchQuery?.property_type ? { property_type: searchQuery?.property_type } : {}
@@ -109,8 +124,8 @@ async function run() {
 
                 // Execute the aggregation
                 const cursor = RoomCollection.aggregate(pipeline);
-
                 const result = await cursor.toArray();
+
 
                 // Check if the result is empty
                 if (result.length === 0) {
@@ -130,12 +145,8 @@ async function run() {
 
 
 
-
-
-
-
-        await client.db("admin").command({ ping: 1 });
-        console.log("Pinged your deployment. You successfully connected to MongoDB!");
+        // await client.db("admin").command({ ping: 1 });
+        // console.log("Pinged your deployment. You successfully connected to MongoDB!");
     }
     finally {
         // Ensures that the client will close when you finish/error
