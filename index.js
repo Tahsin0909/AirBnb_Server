@@ -59,7 +59,8 @@ async function run() {
                     instant_book: req.query.instant_book,
                     self_check_in: req.query.self_check_in,
                     free_cancellation: req.query.free_cancellation,
-                    allow_pets: req.query.allow_pets
+                    allow_pets: req.query.allow_pets,
+                    rating: req.query.rating
                 };
 
 
@@ -101,6 +102,12 @@ async function run() {
 
                     },
 
+                    // Match by rating and by default it will be 4.8 and will come from frontend if provided
+                    {
+                        $match: (searchQuery?.rating ? { rating: { $gte: parseFloat(searchQuery?.rating) } } : {}),
+
+                    },
+
                     // Match by available_dates within the range if provided
                     {
                         $match: searchQuery?.start_date && searchQuery?.end_date ? {
@@ -124,7 +131,7 @@ async function run() {
                     {
                         $match: searchQuery?.property_type ? { property_type: searchQuery?.property_type } : {}
                     },
-                    
+
                     // Match by booking_options (instant_book, self_check_in, etc.) if provided
                     {
                         $match: {
