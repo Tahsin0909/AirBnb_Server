@@ -91,8 +91,8 @@ async function run() {
                     // Match by price range if provided
                     {
                         $match: {
-                            ...(searchQuery?.min_price ? { price: { $gte: searchQuery?.min_price } } : {}),
-                            ...(searchQuery?.max_price ? { price: { $lte: searchQuery?.max_price } } : {})
+                            ...(searchQuery?.min_price ? { price: { $gte: parseInt(searchQuery?.min_price) } } : {}),
+                            ...(searchQuery?.max_price ? { price: { $lte: parseInt(searchQuery?.max_price) } } : {})
                         }
                     },
 
