@@ -98,7 +98,7 @@ async function run() {
 
                     // Match by max guest if provided
                     {
-                        $match: (searchQuery?.max_guests ? { max_guests: { $lte: parseInt(searchQuery?.max_guests) } } : {}),
+                        $match: (searchQuery?.max_guests ? { max_guests: { $gte: parseInt(searchQuery?.max_guests) } } : {}),
 
                     },
 
