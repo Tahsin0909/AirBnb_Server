@@ -119,7 +119,7 @@ async function run() {
 
                     // Match by bedrooms if provided
                     {
-                        $match: searchQuery?.bedrooms ? { bedrooms: searchQuery?.bedrooms } : {}
+                        $match: searchQuery?.bedrooms ? { bedrooms: { $lte: parseInt(searchQuery?.bedrooms) }} : {}
                     },
 
                     // Match by amenities if provided
